@@ -1,0 +1,8 @@
+<div class="choose-quantity row">
+    <button tabindex="-1" *ngIf="!readOnly && increment !== '0'" class="col-xs-4 col-1 btn-block rounded-0" (click)="onRemove()" color="primary" style="width:25px;padding:0">-</button>
+    <input *ngIf="!readOnly" class="input-sm col-sm col-10" #myInput (click)="myInput.select()" (focus)="myInput.select()" [readonly]="readOnly" [disabled]="disabled" type="string" onlyNumber="true" tabindex="tabindex" [value]="quantityStr" (change)="changeInput($event)" style="width: 110px">
+    <div  *ngIf="readOnly" class="col-xs-4 col-10" style="width: 10px">
+        {{ quantityStr }}
+    </div>
+    <button tabindex="-1" *ngIf="!readOnly && increment !== '0'" class="col-xs-4 col-1 btn-block rounded-0" (click)="onAdd()" color="primary" style="width:25px;padding:0">+</button>
+ </div>

@@ -1,0 +1,138 @@
+<div class="container">
+    <form [formGroup]="inputForm" (ngSubmit)="onChange()">
+        <div *ngIf="!compact">
+            <h1>Monte Carlo Retirement Simulator</h1>
+            <hr>
+            Adjust any of the parameters below and observe how it affects your chance of retirement success.
+            <br><br>
+            <div class="card rounded bg-light">
+                <div class="row mb-4 mt-4 ms-2">
+                    <label for="initialPrincipal" class="col-sm-6 col-form-label-xs h5">Retirement savings:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="initialPrincipal" tabindex="1" class="form-control-xs w-50" increment="1000" decimals="0" currency="$" formControlName="initialPrincipal" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="initialPrincipal" class="col-sm-6 col-form-label-xs small">The amount of money you plan to save for retirement.</label>
+                </div>
+                <div class="row mb-4 ms-2">
+                    <label for="monthlyExpenses" class="col-sm-6 col-form-label-xs h5">{{ periodContribLabel }} expenses:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="monthlyExpenses" tabindex="2" class="form-control-xs w-50" increment="100" decimals="0" currency="$" formControlName="monthlyExpenses" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="monthlyExpenses" class="col-sm-6 col-form-label-xs small">The amount of money you plan to spend per month.</label>
+                </div>
+            </div>
+            <br>
+            <div class="card rounded bg-light">
+                <div class="row mb-4 mt-4 ms-2">
+                    <label for="retireAge" class="col-sm-6 col-form-label-xs h5">Retirement age:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="retireAge" tabindex="3" class="form-control-xs w-50" minValue="16" increment="1" decimals="0" formControlName="retireAge" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="retireAge" class="col-sm-6 col-form-label-xs small">The age at which you want to start drawing from your retirement savings.</label>
+                </div>
+                <div class="row mb-4 ms-2">
+                    <label for="expireAge" class="col-sm-6 col-form-label-xs h5">Life expectancy age:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="expireAge" tabindex="4" class="form-control-xs w-50" minValue="16" increment="1" decimals="0" formControlName="expireAge" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="expireAge" class="col-sm-6 col-form-label-xs small">The age at which you think you're going to die (*gulp*).</label>
+                </div>
+            </div>
+            <br>
+            <div class="card rounded bg-light">
+                <div class="row mb-4 mt-4 ms-2">
+                    <label for="socialSecurityIncome" class="col-sm-6 col-form-label-xs h5">Monthly Social Security benefit:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="socialSecurityIncome" tabindex="5" class="form-control-xs w-50" minValue="0" increment="100" decimals="0" currency="$" formControlName="socialSecurityIncome" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="socialSecurityIncome" class="col-sm-6 col-form-label-xs small">The amount of money you expect to receive from Social Security.</label>
+                </div>
+                <div class="row mb-4 ms-2">
+                    <label for="socialSecurityAge" class="col-sm-6 col-form-label-xs h5">Social Security age:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="socialSecurityAge" tabindex="6" class="form-control-xs w-50" minValue="62" increment="1" decimals="0" formControlName="socialSecurityAge" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="socialSecurityAge" class="col-sm-6 col-form-label-xs small">The age at which you expect to claim Social Security benefits.</label>
+                </div>
+            </div>
+            <br>
+            <div class="card rounded bg-light">
+                <div class="row mb-4 mt-4 ms-2">
+                    <label for="monthlyContribution" class="col-sm-6 col-form-label-xs h5">Monthly contribution:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="monthlyContribution" tabindex="7" class="form-control-xs w-50" increment="100" decimals="0" currency="$" formControlName="monthlyContribution" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="monthlyContribution" class="col-sm-6 col-form-label-xs small">The amount of money you plan to contribute towards retirement (e.g. Pensions, Rental income).</label>
+                </div>
+                <div class="row mb-4 ms-2">
+                    <label for="taxRate" class="col-sm-6 col-form-label-xs h5">Effective tax rate:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="taxRate" tabindex="8" class="form-control-xs w-50" minValue="0" increment=".1" decimals="2" formControlName="taxRate" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="taxRate" class="col-sm-6 col-form-label-xs small">Your effective tax rate in retirement. This is not the same as your marginal tax rate.</label>
+                </div>
+            </div>
+            <br>
+        </div>
+        <div *ngIf="compact">
+            <div class="row mb-2 mt-4 ms-2">
+                <label for="initialPrincipal" class="col-sm-3 col-form-label-xs h6">Retirement savings:</label>
+                <div class="col-sm-3">
+                    <choose-quantity id="initialPrincipal" isReadOnly="{{ readOnly }}" tabindex="1" class="form-control-xs w-50" minValue="0" increment="1000" decimals="0" currency="$" formControlName="initialPrincipal" (change)="onChange()"></choose-quantity>
+                </div>
+                <label for="monthlyExpenses" class="col-sm-3 col-form-label-xs h6">Monthly expenses:</label>
+                <div class="col-sm-3">
+                    <choose-quantity id="monthlyExpenses" isReadOnly="{{ readOnly }}" tabindex="2" class="form-control-xs w-50" increment="100" decimals="0" currency="$" formControlName="monthlyExpenses" (change)="onChange()"></choose-quantity>
+                </div>
+            </div>
+            <div class="row mb-2 mt-4 ms-2">
+                <label for="retireAge" class="col-sm-3 col-form-label-xs h6">Retirement age:</label>
+                <div class="col-sm-3">
+                    <choose-quantity id="retireAge" isReadOnly="{{ readOnly }}" tabindex="3" class="form-control-xs w-50" minValue="16" increment="1" decimals="0" formControlName="retireAge" (change)="onChange()"></choose-quantity>
+                </div>
+                <label for="expireAge" class="col-sm-3 col-form-label-xs h6">Life expectancy age:</label>
+                <div class="col-sm-3">
+                    <choose-quantity id="expireAge" isReadOnly="{{ readOnly }}" tabindex="4" class="form-control-xs w-50" minValue="16" increment="1" decimals="0" formControlName="expireAge" (change)="onChange()"></choose-quantity>
+                </div>
+            </div>
+            <div class="row mb-2 mt-4 ms-2">
+                <label for="socialSecurityIncome" class="col-sm-3 col-form-label-xs h6">Monthly Social Security:</label>
+                <div class="col-sm-3">
+                    <choose-quantity id="socialSecurityIncome" isReadOnly="{{ readOnly }}" tabindex="5" class="form-control-xs w-50" minValue="0" increment="100" decimals="0" currency="$" formControlName="socialSecurityIncome" (change)="onChange()"></choose-quantity>
+                </div>
+                <label for="socialSecurityAge" class="col-sm-3 col-form-label-xs h6">Social Security age:</label>
+                <div class="col-sm-3">
+                    <choose-quantity id="socialSecurityAge" isReadOnly="{{ readOnly }}" tabindex="6" class="form-control-xs w-50" minValue="62" increment="1" decimals="0" formControlName="socialSecurityAge" (change)="onChange()"></choose-quantity>
+                </div>
+            </div>
+            <div class="row mb-2 mt-4 ms-2">
+                <label for="monthlyContribution" class="col-sm-3 col-form-label-xs h6">Monthly contribution:</label>
+                <div class="col-sm-3">
+                    <choose-quantity id="monthlyContribution" isReadOnly="{{ readOnly }}" tabindex="7" class="form-control-xs w-50" increment="100" decimals="0" currency="$" formControlName="monthlyContribution" (change)="onChange()"></choose-quantity>
+                </div>
+                <label for="taxRate" class="col-sm-3 col-form-label-xs h6">Effective tax rate:</label>
+                <div class="col-sm-3">
+                    <choose-quantity id="taxRate" isReadOnly="{{ readOnly }}" tabindex="8" class="form-control-xs w-50" minValue="0" increment=".1" decimals="2" formControlName="taxRate" (change)="onChange()"></choose-quantity>
+                </div>
+            </div>
+        </div>
+    </form>
+    <hr>
+    <div class="row">
+        <div *ngIf="probabilityOfSuccess >= 0" class="col-md-12 mx-auto">
+            <h4>Based on 1,000 simulations, there is a {{ probabilityOfSuccess | percent:'1.0' }} probability that your savings will last until the age of {{ lifeSpan }}.
+                <span *ngIf="brokeAge > 0">You could run out of money as early as age {{ brokeAge }}!</span>
+            </h4>
+            
+        </div>
+    </div>
+    <div *ngIf="probabilityOfSuccess >= 0" class="row mb-4" style="height: 400px">
+        <canvas baseChart class="chart"
+            [data]="lineChartData"
+            [options]="lineChartOptions(minY, maxX)"
+            [plugins]="chartPlugins"
+            [type]="lineChartType">
+        </canvas>
+    </div>
+  
+</div>
