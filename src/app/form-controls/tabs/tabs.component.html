@@ -1,0 +1,13 @@
+<div class="tab-content">
+    <ng-container *ngIf="selectedIndex >= 0">
+        <ng-container *ngTemplateOutlet="tabs[selectedIndex]?.template"></ng-container>
+    </ng-container>
+</div>
+<div class="tabs">
+    <button
+        *ngFor="let tab of tabs; let i = index"
+        [class.active]="i === selectedIndex"
+        (click)="selectTab(i)">
+        {{ tab.label }}
+    </button>
+</div>

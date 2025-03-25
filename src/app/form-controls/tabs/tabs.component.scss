@@ -1,0 +1,51 @@
+/* Container styling for tabs and form */
+.tabs {
+  display: flex;
+  justify-content: flex-start;
+  gap: 2px;
+  margin-bottom: 15px;
+}
+
+.tabs button {
+  background-color: #f4f4f4; /* Matches form background */
+  color: #333; /* Text color to suit lighter background */
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tabs button:hover {
+  background-color: #e0e0e0; /* Slightly darker hover color */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.tabs button.active {
+  background-color: #ffffff; /* Highlighted active button */
+  border-color: #ccc;
+  box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Form styling to match tabs */
+.form-container {
+  background-color: #f4f4f4; /* Matches tab buttons */
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tab-content {
+  font-family: Arial, sans-serif;
+  font-size: 1.2rem;
+  color: #333;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #ffffff; /* Clean background for content */
+  box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.1);
+}
