@@ -11,6 +11,7 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ChooseQuantityComponent } from './form-controls/choose-quantity/choose-quantity.component';
 import { OnlyNumberDirective } from './directives/only-number.directive';
 import { BaseComponent } from './base/base.component';
+import { TabsComponent } from './form-controls/tabs/tabs.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { BaseComponent } from './base/base.component';
     KeyPipe,
     ChooseQuantityComponent,
     OnlyNumberDirective,
-    BaseComponent
+    BaseComponent,
+    TabsComponent
   ],
   imports: [
     BrowserModule,

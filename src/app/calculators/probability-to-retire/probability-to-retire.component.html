@@ -1,28 +1,24 @@
 <div class="container">
     <form [formGroup]="inputForm" (ngSubmit)="onChange()">
-        <div *ngIf="!compact">
-            <h1>Monte Carlo Retirement Simulator</h1>
-            <hr>
-            Adjust any of the parameters below and observe how it affects your chance of retirement success.
-            <br><br>
+        
+        <ng-template #template1>
             <div class="card rounded bg-light">
                 <div class="row mb-4 mt-4 ms-2">
                     <label for="initialPrincipal" class="col-sm-6 col-form-label-xs h5">Retirement savings:</label>
                     <div class="col-sm-5">
-                        <choose-quantity id="initialPrincipal" tabindex="1" class="form-control-xs w-50" increment="1000" decimals="0" currency="$" formControlName="initialPrincipal" (change)="onChange()"></choose-quantity>
+                        <choose-quantity id="initialPrincipal" tabindex="1" class="form-control-xs w-50" increment="50000" decimals="0" currency="$" formControlName="initialPrincipal" (change)="onChange()"></choose-quantity>
                     </div>
                     <label for="initialPrincipal" class="col-sm-6 col-form-label-xs small">The amount of money you plan to save for retirement.</label>
                 </div>
                 <div class="row mb-4 ms-2">
                     <label for="monthlyExpenses" class="col-sm-6 col-form-label-xs h5">{{ periodContribLabel }} expenses:</label>
                     <div class="col-sm-5">
-                        <choose-quantity id="monthlyExpenses" tabindex="2" class="form-control-xs w-50" increment="100" decimals="0" currency="$" formControlName="monthlyExpenses" (change)="onChange()"></choose-quantity>
+                        <choose-quantity id="monthlyExpenses" tabindex="2" class="form-control-xs w-50" increment="200" decimals="0" currency="$" formControlName="monthlyExpenses" (change)="onChange()"></choose-quantity>
                     </div>
                     <label for="monthlyExpenses" class="col-sm-6 col-form-label-xs small">The amount of money you plan to spend per month.</label>
                 </div>
             </div>
-            <br>
-            <div class="card rounded bg-light">
+            <div class="card rounded mt-4 bg-light">
                 <div class="row mb-4 mt-4 ms-2">
                     <label for="retireAge" class="col-sm-6 col-form-label-xs h5">Retirement age:</label>
                     <div class="col-sm-5">
@@ -38,12 +34,14 @@
                     <label for="expireAge" class="col-sm-6 col-form-label-xs small">The age at which you think you're going to die (*gulp*).</label>
                 </div>
             </div>
-            <br>
+        </ng-template>
+        
+        <ng-template #template2>
             <div class="card rounded bg-light">
                 <div class="row mb-4 mt-4 ms-2">
                     <label for="socialSecurityIncome" class="col-sm-6 col-form-label-xs h5">Monthly Social Security benefit:</label>
                     <div class="col-sm-5">
-                        <choose-quantity id="socialSecurityIncome" tabindex="5" class="form-control-xs w-50" minValue="0" increment="100" decimals="0" currency="$" formControlName="socialSecurityIncome" (change)="onChange()"></choose-quantity>
+                        <choose-quantity id="socialSecurityIncome" tabindex="5" class="form-control-xs w-50" minValue="0" increment="200" decimals="0" currency="$" formControlName="socialSecurityIncome" (change)="onChange()"></choose-quantity>
                     </div>
                     <label for="socialSecurityIncome" class="col-sm-6 col-form-label-xs small">The amount of money you expect to receive from Social Security.</label>
                 </div>
@@ -55,14 +53,16 @@
                     <label for="socialSecurityAge" class="col-sm-6 col-form-label-xs small">The age at which you expect to claim Social Security benefits.</label>
                 </div>
             </div>
-            <br>
-            <div class="card rounded bg-light">
+            <div class="card rounded mt-4 bg-light">
                 <div class="row mb-4 mt-4 ms-2">
-                    <label for="monthlyContribution" class="col-sm-6 col-form-label-xs h5">Monthly contribution:</label>
-                    <div class="col-sm-5">
+                    <label for="monthlyContribution" class="col-sm-6 col-form-label-xs h5">Other monthly income or pension:</label>
+                    <div class="col-sm-5" style="gap: 10px">
                         <choose-quantity id="monthlyContribution" tabindex="7" class="form-control-xs w-50" increment="100" decimals="0" currency="$" formControlName="monthlyContribution" (change)="onChange()"></choose-quantity>
+                        <label >
+                            <input id="isContribAdj" type="checkbox"  formControlName="isContribAdj" (change)="onChange()"/>&nbsp;Inflation adjusted
+                        </label>
                     </div>
-                    <label for="monthlyContribution" class="col-sm-6 col-form-label-xs small">The amount of money you plan to contribute towards retirement (e.g. Pensions, Rental income).</label>
+                    <!-- label for="monthlyContribution" class="col-sm-6 col-form-label-xs small">Other amount you plan to contribute towards retirement (e.g. Pensions).</label-->
                 </div>
                 <div class="row mb-4 ms-2">
                     <label for="taxRate" class="col-sm-6 col-form-label-xs h5">Effective tax rate:</label>
@@ -72,17 +72,24 @@
                     <label for="taxRate" class="col-sm-6 col-form-label-xs small">Your effective tax rate in retirement. This is not the same as your marginal tax rate.</label>
                 </div>
             </div>
-            <br>
+        </ng-template>
+
+        <div *ngIf="!compact">
+            <h1>Monte Carlo Retirement Simulator</h1>
+            <hr>
+            Modify the predefined parameters below to determine your chance of retirement success.
+            <br><br>
+            <tabs-component [tabs]="tabData"></tabs-component>
         </div>
         <div *ngIf="compact">
             <div class="row mb-2 mt-4 ms-2">
                 <label for="initialPrincipal" class="col-sm-3 col-form-label-xs h6">Retirement savings:</label>
                 <div class="col-sm-3">
-                    <choose-quantity id="initialPrincipal" isReadOnly="{{ readOnly }}" tabindex="1" class="form-control-xs w-50" minValue="0" increment="1000" decimals="0" currency="$" formControlName="initialPrincipal" (change)="onChange()"></choose-quantity>
+                    <choose-quantity id="initialPrincipal" isReadOnly="{{ readOnly }}" tabindex="1" class="form-control-xs w-50" minValue="0" increment="50000" decimals="0" currency="$" formControlName="initialPrincipal" (change)="onChange()"></choose-quantity>
                 </div>
                 <label for="monthlyExpenses" class="col-sm-3 col-form-label-xs h6">Monthly expenses:</label>
                 <div class="col-sm-3">
-                    <choose-quantity id="monthlyExpenses" isReadOnly="{{ readOnly }}" tabindex="2" class="form-control-xs w-50" increment="100" decimals="0" currency="$" formControlName="monthlyExpenses" (change)="onChange()"></choose-quantity>
+                    <choose-quantity id="monthlyExpenses" isReadOnly="{{ readOnly }}" tabindex="2" class="form-control-xs w-50" increment="200" decimals="0" currency="$" formControlName="monthlyExpenses" (change)="onChange()"></choose-quantity>
                 </div>
             </div>
             <div class="row mb-2 mt-4 ms-2">
@@ -98,7 +105,7 @@
             <div class="row mb-2 mt-4 ms-2">
                 <label for="socialSecurityIncome" class="col-sm-3 col-form-label-xs h6">Monthly Social Security:</label>
                 <div class="col-sm-3">
-                    <choose-quantity id="socialSecurityIncome" isReadOnly="{{ readOnly }}" tabindex="5" class="form-control-xs w-50" minValue="0" increment="100" decimals="0" currency="$" formControlName="socialSecurityIncome" (change)="onChange()"></choose-quantity>
+                    <choose-quantity id="socialSecurityIncome" isReadOnly="{{ readOnly }}" tabindex="5" class="form-control-xs w-50" minValue="0" increment="200" decimals="0" currency="$" formControlName="socialSecurityIncome" (change)="onChange()"></choose-quantity>
                 </div>
                 <label for="socialSecurityAge" class="col-sm-3 col-form-label-xs h6">Social Security age:</label>
                 <div class="col-sm-3">
