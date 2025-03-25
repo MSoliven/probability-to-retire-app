@@ -21,7 +21,8 @@ import { BaseComponent } from './base/base.component';
     ChooseQuantityComponent,
     TabsComponent,
     OnlyNumberDirective,
-    BaseComponent
+    BaseComponent,
+    TabsComponent
   ],
   imports: [
     BrowserModule,
