@@ -1,0 +1,6 @@
+.checkbox-label {
+    white-space: nowrap; /* Prevents text from wrapping */
+    display: flex;
+    align-items: center; /* Aligns text with the checkbox */
+    gap: 5px; /* Adds space between checkbox and label */
+}

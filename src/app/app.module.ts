@@ -9,6 +9,7 @@ import { ProbabilityToRetireComponent } from './calculators/probability-to-retir
 import { KeyPipe } from './key.pipe';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ChooseQuantityComponent } from './form-controls/choose-quantity/choose-quantity.component';
+import { TabsComponent } from './form-controls/tabs/tabs.component';
 import { OnlyNumberDirective } from './directives/only-number.directive';
 import { BaseComponent } from './base/base.component';
 
@@ -18,6 +19,7 @@ import { BaseComponent } from './base/base.component';
     ProbabilityToRetireComponent,
     KeyPipe,
     ChooseQuantityComponent,
+    TabsComponent,
     OnlyNumberDirective,
     BaseComponent
   ],
