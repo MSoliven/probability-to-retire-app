@@ -18,11 +18,13 @@ export class ProbabilityToRetireComponent extends BaseComponent implements OnIni
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
   @ViewChild('template1', { static: true }) template1!: TemplateRef<any>;
   @ViewChild('template2', { static: true }) template2!: TemplateRef<any>;
+  @ViewChild('template3', { static: true }) template3!: TemplateRef<any>;
 
   inputForm: any = {};
   tabData = [
     { label: 'Main', template: this.template1 },
-    { label: 'Other input', template: this.template2 }
+    { label: 'Other income', template: this.template2 },
+    { label: 'Portfolio', template: this.template3 }
   ];
 
   public lineChartOptions(minY: number, maxX: number): ChartConfiguration['options'] {
@@ -33,6 +35,10 @@ export class ProbabilityToRetireComponent extends BaseComponent implements OnIni
           x: {
             max: maxX,
             stacked: true,
+            ticks: {
+              autoSkip: true,  // Enable autoskip
+              maxTicksLimit: 10, // Optional: Limit the maximum number of labels
+            }
           },
           y: {
             min: minY
@@ -73,7 +79,7 @@ export class ProbabilityToRetireComponent extends BaseComponent implements OnIni
   public viewMode:string = "";
   public minY: number = 0;
   public maxY: number = 30000000;
-  public maxX: number = 80;
+  public maxX: number = 150;
 
   public probabilityOfSuccess: number = -1;
   public lifeSpan: number = -1;
@@ -90,30 +96,34 @@ export class ProbabilityToRetireComponent extends BaseComponent implements OnIni
 
     this.tabData[0].template = this.template1;
     this.tabData[1].template = this.template2;
+    this.tabData[2].template = this.template3;
     
     this.route.queryParams
       .subscribe(params => {
         let initial = params["initial"] as string;
-        let contribution = params["contrib"] as string;
+        let contrib = params["contrib"] as string;
         let contribAdj = params["contribAdj"] as string;
+        let contribAge = params["contribAge"] as string;
         let expenses = params["expenses"] as string;
         let retireAge = params["retireAge"] as string;
         let expireAge = params["expireAge"] as string;
-        let socialSecurityAge = params["ssAge"] as string;
-        let socialSecurityIncome = params["ssIncome"] as string; 
-        let taxRate = params["tax"] as string; 
+        let ssAge = params["ssAge"] as string;
+        let ssIncome = params["ssIncome"] as string; 
+        let stocks = params["stocks"] as string;
+        let bonds = params["bonds"] as string; 
+        let tax = params["tax"] as string; 
         let view = params["view"] as string;
         
-        this.onInitForm(initial, contribution, contribAdj, expenses, retireAge, expireAge, 
-          socialSecurityAge, socialSecurityIncome, taxRate, view);
+        this.onInitForm(initial, contrib, contribAdj, contribAge, expenses, retireAge, expireAge, 
+          ssAge, ssIncome, stocks, bonds, tax, view);
         this.onChange(true);
       }
     );
 
   }
 
-  onInitForm(initial: string, contribution: string, contribAdj: string, expenses: string, retireAge: string, expireAge: string, 
-    socialSecurityAge: string, socialSecurityIncome: string, taxRate: string, view: string) {
+  onInitForm(initial: string, contrib: string, contribAdj: string, contribAge: string, expenses: string, retireAge: string, expireAge: string, 
+    ssAge: string, ssIncome: string, stocks: string, bonds: string, tax: string, view: string) {
 
     const getValue = (val: string, def: any) => {
       if (!val) return def;
@@ -146,26 +156,48 @@ export class ProbabilityToRetireComponent extends BaseComponent implements OnIni
 
     this.inputForm = this.fb.group({
       initialPrincipal: [getValue(initial, "$1,000,000"), Validators.required],
-      monthlyContribution: [getValue(contribution, "$0")],
-      isContribAdj: [getValue(contribAdj, false)],
+      monthlyContribution: [getValue(contrib, "$0")],
+      isMonthlyContributionAdj: [getValue(contribAdj, false)],
+      monthlyContributionAge: [getValue(contribAge, "62")],
       monthlyExpenses: [getValue(expenses, "$4,000")],
       retireAge: [getValue(retireAge, "62")],
       expireAge: [getValue(expireAge, "92")],
-      socialSecurityAge: [getValue(socialSecurityAge, "67")],
-      socialSecurityIncome: [getValue(socialSecurityIncome, "$0")],
-      taxRate: [getValue(taxRate, ".15")],
+      socialSecurityAge: [getValue(ssAge, "67")],
+      socialSecurityIncome: [getValue(ssIncome, "$0")],
+      stocksPercentage: [getValue(stocks, "75")],
+      bondsPercentage: [getValue(bonds, "25")],
+      taxRate: [getValue(tax, ".15")],
       viewMode: [getValue(view, "")]
     });
 
-    this.inputForm.get('isContribAdj')?.disable();
+    this.inputForm.get('isMonthlyContributionAdj')?.disable();
     // Watch for changes in 'monthlyContribution' and enable/disable the checkbox dynamically
     this.inputForm.get('monthlyContribution')?.valueChanges.subscribe((value: string) => {
       if (value === "$0") {
-        this.inputForm.get('isContribAdj')?.disable(); // Disable checkbox if input is 0
+        this.inputForm.get('isMonthlyContributionAdj')?.disable(); // Disable checkbox if input is 0
       } else {
-        this.inputForm.get('isContribAdj')?.enable(); // Enable checkbox if input is not 0
+        this.inputForm.get('isMonthlyContributionAdj')?.enable(); // Enable checkbox if input is not 0
       }
     });
+
+    let isUpdating = false; // Flag to prevent circular updates
+
+    this.inputForm.get('stocksPercentage')?.valueChanges.subscribe((value: string) => {
+      if (!isUpdating) {
+        isUpdating = true;
+        this.inputForm.get('bondsPercentage')?.setValue((100-FormatUtil.parseToNumber(value)).toFixed(0));
+        isUpdating = false;
+      }
+    });
+
+    this.inputForm.get('bondsPercentage')?.valueChanges.subscribe((value: string) => {
+      if (!isUpdating) {
+        isUpdating = true;
+        this.inputForm.get('stocksPercentage')?.setValue((100-FormatUtil.parseToNumber(value)).toFixed(0));
+        isUpdating = false;
+      }
+    });
+
   }
 
   onChange(init?: boolean) {
@@ -174,34 +206,43 @@ export class ProbabilityToRetireComponent extends BaseComponent implements OnIni
     let input = this.inputForm.value;
 
     if (!init && input.viewMode) {
-      this.onInitForm(input.initialPrincipal, input.monthlyContribution, input.isContribAdj, input.monthlyExpenses, input.retireAge,
-        input.expireAge, input.socialSecurityAge, input.socialSecurityIncome, input.taxRate, input.viewMode);
+      this.onInitForm(input.initialPrincipal, input.monthlyContribution, input.isMonthlyContributionAdj, input.monthlyContributionAge,
+        input.monthlyExpenses, input.retireAge, input.expireAge, input.socialSecurityAge, input.socialSecurityIncome, 
+        input.stocksPercentage, input.bondsPercentage, input.taxRate, input.viewMode);
       input = this.inputForm.value;
     }
     
     let principal = FormatUtil.parseToNumber(input.initialPrincipal);
-    let contrib = FormatUtil.parseToNumber(input.monthlyContribution);
-    let isContribAdj = input.isContribAdj;
+    let monthlyContribution = FormatUtil.parseToNumber(input.monthlyContribution);
+    let isMonthlyContributionAdj = input.isMonthlyContributionAdj;
+    let monthlyContributionAge = FormatUtil.parseToNumber(input.monthlyContributionAge);
     let expenses = FormatUtil.parseToNumber(input.monthlyExpenses);
     let retireAge = FormatUtil.parseToNumber(input.retireAge);
     let expireAge = FormatUtil.parseToNumber(input.expireAge);
     let ssAge = FormatUtil.parseToNumber(input.socialSecurityAge);
     let ssIncome = FormatUtil.parseToNumber(input.socialSecurityIncome);
+    let stocksPercentage = FormatUtil.parseToNumber(input.stocksPercentage);
+    let bondsPercentage = FormatUtil.parseToNumber(input.bondsPercentage);    
     let taxRate = FormatUtil.parseToNumber(input.taxRate);
 
     this.lifeSpan = expireAge;
 
     this.lineChartData.labels 
-      = this.calcLabels(input.retireAge as number, input.expireAge as number);  
+      = this.calcLabels(parseInt(input.retireAge), parseInt(input.expireAge));  
   
     this.lineChartData.datasets 
-      = this.calcResultsets(principal, contrib, isContribAdj, expenses, retireAge, expireAge, 
-        ssAge, ssIncome, taxRate, input.viewMode);
+      = this.calcResultsets(principal, monthlyContribution, isMonthlyContributionAdj, monthlyContributionAge, expenses, retireAge, expireAge, 
+        ssAge, ssIncome, stocksPercentage, bondsPercentage, taxRate, input.viewMode);
 
     this.chart?.update();
   }
 
   calcLabels(retireAge: number, expireAge: number) : string[] {
+
+    if (retireAge > expireAge) {
+      throw new Error('retireAge must be less than or equal to expireAge');
+    }
+    
     let labels: string[] = [];
 
     for (let i=retireAge; i <= expireAge; i++) {
@@ -211,12 +252,14 @@ export class ProbabilityToRetireComponent extends BaseComponent implements OnIni
     return labels;
   }
 
-  calcResultsets(principal: number, contrib: number, isContribAdj: boolean, expenses: number, 
+  calcResultsets(principal: number, monthlyContribution: number, isMonthlyContributionAgeAdj: boolean, monthlyContributionAge: number, expenses: number, 
     retireAge: number, expireAge: number, ssAge: number, 
-    ssIncome: number, taxRate: number, viewmode?: string): any {
+    ssIncome: number, stocksPercentage: number, bondsPercentage: number,
+    taxRate: number, viewmode?: string): any {
   
       let results: MonteCarloResults = this.monteCarloService.performMonteCarloSimulation(
-          principal, contrib, isContribAdj, expenses, retireAge, expireAge, ssAge, ssIncome, taxRate);
+          principal, monthlyContribution, isMonthlyContributionAgeAdj, monthlyContributionAge, expenses, retireAge, expireAge, ssAge, ssIncome, 
+          stocksPercentage, bondsPercentage, taxRate);
 
       this.probabilityOfSuccess = results.probabilityOfSuccess;
 

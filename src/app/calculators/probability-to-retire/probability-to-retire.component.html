@@ -59,12 +59,40 @@
                     <div class="col-sm-5" style="gap: 10px">
                         <choose-quantity id="monthlyContribution" tabindex="7" class="form-control-xs w-50" increment="100" decimals="0" currency="$" formControlName="monthlyContribution" (change)="onChange()"></choose-quantity>
                         <label >
-                            <input id="isContribAdj" type="checkbox"  formControlName="isContribAdj" (change)="onChange()"/>&nbsp;Inflation adjusted
+                            <input id="isMonthlyContributionAdj" type="checkbox"  formControlName="isMonthlyContributionAdj" (change)="onChange()"/>&nbsp;Inflation adjusted
                         </label>
                     </div>
-                    <!-- label for="monthlyContribution" class="col-sm-6 col-form-label-xs small">Other amount you plan to contribute towards retirement (e.g. Pensions).</label-->
+                    <!-- label for="contrib" class="col-sm-6 col-form-label-xs small">Other amount you plan to contribute towards retirement (e.g. Pensions).</label-->
                 </div>
                 <div class="row mb-4 ms-2">
+                    <label for="monthlyContributionAge" class="col-sm-6 col-form-label-xs h5">Other monthly income age:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="monthlyContributionAge" tabindex="6" class="form-control-xs w-50" minValue="62" increment="1" decimals="0" formControlName="monthlyContributionAge" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="monthlyContributionAge" class="col-sm-6 col-form-label-xs small">The age at which you expect to have this other income.</label>
+                </div>
+            </div>
+        </ng-template>
+
+        <ng-template #template3>
+            <div class="card rounded bg-light">
+                <div class="row mb-4 mt-4 ms-2">
+                    <label for="stocksPercentage" class="col-sm-6 col-form-label-xs h5">Stock allocation:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="stocksPercentage" tabindex="5" class="form-control-xs w-50" minValue="0" maxValue="100" increment="5" decimals="0" formControlName="stocksPercentage" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="stocksPercentage" class="col-sm-6 col-form-label-xs small">The percentage of stocks in your retirement portfolio.</label>
+                </div>
+                <div class="row mb-4 ms-2">
+                    <label for="bondsPercentage" class="col-sm-6 col-form-label-xs h5">Bond allocation:</label>
+                    <div class="col-sm-5">
+                        <choose-quantity id="bondsPercentage" tabindex="6" class="form-control-xs w-50" minValue="0" maxValue="100" increment="5" decimals="0" formControlName="bondsPercentage" (change)="onChange()"></choose-quantity>
+                    </div>
+                    <label for="bondsPercentage" class="col-sm-6 col-form-label-xs small">The percentage of bonds in your retirement portfolio.</label>
+                </div>
+            </div>
+            <div class="card rounded mt-4 bg-light">
+                <div class="row mb-4 mt-4 ms-2">
                     <label for="taxRate" class="col-sm-6 col-form-label-xs h5">Effective tax rate:</label>
                     <div class="col-sm-5">
                         <choose-quantity id="taxRate" tabindex="8" class="form-control-xs w-50" minValue="0" increment=".1" decimals="2" formControlName="taxRate" (change)="onChange()"></choose-quantity>
@@ -72,7 +100,7 @@
                     <label for="taxRate" class="col-sm-6 col-form-label-xs small">Your effective tax rate in retirement. This is not the same as your marginal tax rate.</label>
                 </div>
             </div>
-        </ng-template>
+        </ng-template>        
 
         <div *ngIf="!compact">
             <h1>Monte Carlo Retirement Simulator</h1>

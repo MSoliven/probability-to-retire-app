@@ -30,21 +30,24 @@ export class MonteCarloService {
 
   // READ-ONLY parameters for the simulation
   readonly numSimulations = 1000;
-  readonly investmentReturnsMean = 0.007;
-  readonly investmentReturnsVolatility = 0.015;
+  readonly investmentReturnsMean = 0.00685;
+  readonly investmentReturnsVolatility = 0.02675;
   readonly inflationRateVolatility = 0.0005;
-  readonly inflationRateMean = 0.0025;
+  readonly inflationRateMean = 0.0025;  
 
-   // Main Monte Carlo simulation function
-   performMonteCarloSimulation(
+  // Main Monte Carlo simulation function
+  performMonteCarloSimulation(
     initialBalance: number,
-    contribution: number,
-    isContribInflationAdusted: boolean,
+    monthlyContribution: number,
+    isMonthlyContributionAdusted: boolean,
+    monthlyContributionAge: number,
     expenses: number,
     retireAge: number,
     expireAge: number,
     socialSecurityAge: number,
     socialSecurityIncome: number,
+    stocksPercentage: number,
+    bondsPercentage: number,
     taxRate: number,
   ): MonteCarloResults {
 
@@ -54,11 +57,14 @@ export class MonteCarloService {
     let retirementDuration = expireAge - retireAge;
     let retirementDurationMonths = retirementDuration * 12;
     let socialSecurityMonths = retirementDurationMonths - (expireAge - socialSecurityAge) * 12;
+    let monthlyContributionMonths = retirementDurationMonths - (expireAge - monthlyContributionAge) * 12;
+
+    let riskProfile = this.getPortfolioMeanAndStdDev(stocksPercentage, bondsPercentage);
 
     for (let i = 0; i < this.numSimulations; i++) {
       // Generate random investment returns and inflation rates for each month
       const investmentReturns = Array.from({ length: retirementDurationMonths }, () =>
-        this.randomNormal(this.investmentReturnsMean, this.investmentReturnsVolatility)
+        this.randomNormal(riskProfile.monthlyMean, riskProfile.monthlyStdDev)
       );
       const inflationRates = Array.from({ length: retirementDurationMonths }, () =>
         this.randomNormal(this.inflationRateMean, this.inflationRateVolatility)
@@ -66,8 +72,9 @@ export class MonteCarloService {
 
       this.performSingleSimulation(
         initialBalance,
-        contribution,
-        isContribInflationAdusted,
+        monthlyContribution,
+        isMonthlyContributionAdusted,
+        monthlyContributionMonths,
         expenses,
         retirementDuration,
         investmentReturns,
@@ -117,8 +124,9 @@ export class MonteCarloService {
 
   private performSingleSimulation(
     initialBalance: number,
-    contribution: number,
-    isContribInflationAdusted: boolean,
+    monthlyContribution: number,
+    isMonthlyContributionAdusted: boolean,
+    monthlyContributionMonths: number,
     retirementExpenses: number,
     retirementDuration: number,
     investmentReturns: number[],
@@ -134,8 +142,12 @@ export class MonteCarloService {
   
     for (let month = 0; month < numMonths; month++) {
 
-      // Adjust contributions and expenses for inflation
-      contribution = contribution * (isContribInflationAdusted ? (1 + inflationRates[month]) : 1);
+      if (month >= monthlyContributionMonths) {
+        // Adjust monthlyContribution for inflation
+        monthlyContribution = monthlyContribution * (isMonthlyContributionAdusted ? (1 + inflationRates[month]) : 1);
+      }
+
+      // Adjust expenses for inflation
       retirementExpenses = retirementExpenses * (1 + inflationRates[month]);
 
       // Apply taxes on investment returns
@@ -144,7 +156,7 @@ export class MonteCarloService {
       // Update balance for the month
       balance =
         balance * (1 + afterTaxReturn) +
-        contribution -
+        monthlyContribution -
         retirementExpenses;
 
       // Adjust social security for inflation
@@ -171,4 +183,44 @@ export class MonteCarloService {
     // Transform to the desired mean and standard deviation:
     return z * stdev + mean;
   }
+
+  private getPortfolioMeanAndStdDev(stocksWeight: number, bondsWeight: number) {
+    let yearlyMean: number;
+    let yearlyStdDev: number;
+  
+    // Assign realistic yearly values based on ranges in 0.05 increments
+    if (stocksWeight > 95) {
+      yearlyMean = 0.12; // Higher return for extremely stock-heavy portfolios
+      yearlyStdDev = 0.22; // Higher volatility for high stock allocations
+    } else if (stocksWeight > 75) {
+      yearlyMean = 0.10;
+      yearlyStdDev = 0.18;
+    } else if (stocksWeight > 55) {
+      yearlyMean = 0.08;
+      yearlyStdDev = 0.14;
+    } else if (stocksWeight > 35) {
+      yearlyMean = 0.05;
+      yearlyStdDev = 0.10;
+    } else if (stocksWeight > 15) {
+      yearlyMean = 0.04;
+      yearlyStdDev = 0.07;
+    } else {
+      yearlyMean = 0.03; // Lower return for bond-heavy portfolios
+      yearlyStdDev = 0.05; // Lower volatility for high bond allocations
+    }
+  
+    // Convert yearly values to monthly values
+    const monthlyMean = yearlyMean / 12;
+    const monthlyStdDev = yearlyStdDev / Math.sqrt(12);
+  
+    return {
+      stocksWeight,
+      bondsWeight,
+      yearlyMean,
+      yearlyStdDev,
+      monthlyMean,
+      monthlyStdDev,
+    };
+  }
+  
 }

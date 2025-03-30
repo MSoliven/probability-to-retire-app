@@ -38,6 +38,9 @@ export class ChooseQuantityComponent implements ControlValueAccessor, Validator 
   minValue: string = "";
 
   @Input()
+  maxValue: string = "";
+
+  @Input()
   tabindex: string = "";
 
   @Input()
@@ -66,8 +69,8 @@ export class ChooseQuantityComponent implements ControlValueAccessor, Validator 
 
   onAdd() {
     this.markAsTouched();
-    if (!this.disabled) {
-      var num = Number(this.quantityStr.replace(/[^0-9.-]+/g,""));
+    var num = Number(this.quantityStr.replace(/[^0-9.-]+/g,""));
+    if (!this.disabled && (this.maxValue == "" || num < Number(this.maxValue))) {
       num += Number(this.increment);
       this.quantityStr = this.formatNumber(num, Number(this.decimals));
       this.onChange(this.quantityStr);
