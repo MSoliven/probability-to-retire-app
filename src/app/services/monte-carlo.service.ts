@@ -56,8 +56,19 @@ export class MonteCarloService {
 
     let retirementDuration = expireAge - retireAge;
     let retirementDurationMonths = retirementDuration * 12;
-    let socialSecurityMonths = retirementDurationMonths - (expireAge - socialSecurityAge) * 12;
-    let monthlyContributionMonths = retirementDurationMonths - (expireAge - monthlyContributionAge) * 12;
+    let socialSecurityMonths = -1;
+    if (expireAge > socialSecurityAge) {
+      socialSecurityMonths = retirementDurationMonths - (expireAge - socialSecurityAge) * 12;
+      if (socialSecurityMonths < 0) 
+        socialSecurityMonths = 0;
+    }
+
+    let monthlyContributionMonths = -1;
+    if (expireAge > monthlyContributionAge) {
+      monthlyContributionMonths = retirementDurationMonths - (expireAge - monthlyContributionAge) * 12;
+      if (monthlyContributionMonths < 0) 
+        monthlyContributionMonths = 0;
+    }
 
     let riskProfile = this.getPortfolioMeanAndStdDev(stocksPercentage, bondsPercentage);
 
@@ -142,9 +153,12 @@ export class MonteCarloService {
   
     for (let month = 0; month < numMonths; month++) {
 
-      if (month >= monthlyContributionMonths) {
+      if (monthlyContributionMonths >= 0 && month >= monthlyContributionMonths)  {
         // Adjust monthlyContribution for inflation
         monthlyContribution = monthlyContribution * (isMonthlyContributionAdusted ? (1 + inflationRates[month]) : 1);
+      }
+      else {
+        monthlyContribution = 0;
       }
 
       // Adjust expenses for inflation
@@ -163,7 +177,7 @@ export class MonteCarloService {
       socialSecurityIncome = socialSecurityIncome * (1 + inflationRates[month]);
 
       // Consider Social Security benefits
-      if (month >= socialSecurityMonths) {
+      if (socialSecurityMonths >= 0 && month >= socialSecurityMonths) {
         balance += socialSecurityIncome;
       }
 
