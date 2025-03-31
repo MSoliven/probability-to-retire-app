@@ -211,9 +211,9 @@ export class MonteCarloService {
       yearlyStdDev = 0.18;
     } else if (stocksWeight > 55) {
       yearlyMean = 0.08;
-      yearlyStdDev = 0.14;
+      yearlyStdDev = 0.13;
     } else if (stocksWeight > 35) {
-      yearlyMean = 0.05;
+      yearlyMean = 0.06;
       yearlyStdDev = 0.10;
     } else if (stocksWeight > 15) {
       yearlyMean = 0.04;
