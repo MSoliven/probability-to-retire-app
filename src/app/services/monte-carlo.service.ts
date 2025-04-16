@@ -153,25 +153,23 @@ export class MonteCarloService {
   
     for (let month = 0; month < numMonths; month++) {
 
-      if (monthlyContributionMonths >= 0 && month >= monthlyContributionMonths)  {
-        // Adjust monthlyContribution for inflation
-        monthlyContribution = monthlyContribution * (isMonthlyContributionAdusted ? (1 + inflationRates[month]) : 1);
-      }
-      else {
-        monthlyContribution = 0;
-      }
-
       // Adjust expenses for inflation
       retirementExpenses = retirementExpenses * (1 + inflationRates[month]);
 
       // Apply taxes on investment returns
       const afterTaxReturn = investmentReturns[month] * (1 - taxRate);
+;
+      if (monthlyContributionMonths >= 0 && month >= monthlyContributionMonths)  {
+        // Adjust monthlyContribution for inflation
+        monthlyContribution = monthlyContribution * (isMonthlyContributionAdusted ? (1 + inflationRates[month]) : 1);
 
-      // Update balance for the month
-      balance =
-        balance * (1 + afterTaxReturn) +
-        monthlyContribution -
-        retirementExpenses;
+        // Update balance for the month
+        balance = balance * (1 + afterTaxReturn) + monthlyContribution - retirementExpenses;
+      }
+      else {
+         // Update balance for the month
+         balance = balance * (1 + afterTaxReturn) - retirementExpenses;
+      }
 
       // Adjust social security for inflation
       socialSecurityIncome = socialSecurityIncome * (1 + inflationRates[month]);
